@@ -8,7 +8,7 @@ from copy import deepcopy
 app = Flask(__name__)
 app.debug = True
 
-uneditableSourceFields = ['alive', 'id', 'selected']
+uneditableSourceFields = ['alive', 'id', 'selected', 'sourceType']
 
 @app.route("/")
 def hello():
@@ -96,7 +96,8 @@ def getSources():
             # names and a list of source ids that have them:
             if source['name'] not in sourceinfo['source_names']:
                 sourceinfo['source_names'][source['name']] = {'memberids': [],
-                                                              'flattened': {}}
+                                                              'flattened': {},
+                                                              'ignore': {}}
 
             sourceinfo['source_names'][source['name']]['memberids'].append(source['id'])
 
@@ -126,7 +127,7 @@ def getSources():
         # What got flattened?
         # Since we have to tie the Angular data model to a flattened version (sigh)
         # we build this flattened dict instead of using the original sources. It
-        # makes things hard in the long run, but it kinda has to be:
+        # makes things hard in the long run, but it kinda has to be that way:
         for k,v in flattener.iteritems():
             if k not in uneditableSourceFields:
                 if len(v) == 1:
@@ -184,6 +185,11 @@ def putCollectors():
                     else:
                         sourcepayload.pop('blacklist', None)
 
+                    # Remove keys marked to be ignored
+                    for ignorekey in data['source_names'][sourcename]['ignore']:
+                        if ignorekey in sourcepayload:
+                            del sourcepayload[ignorekey]
+
                     # The ID is deliberately absent from the flattened data, add
                     sourcepayload['id'] = sourceid
 
@@ -196,7 +202,7 @@ def putCollectors():
 #                        response['success'].append(result)
 #                    else:
 #                        response['errors'].append(result)
-#                    break
+                    break
 
     # TODO: actually return useful information
     return jsonify(results = response)

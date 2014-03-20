@@ -174,7 +174,7 @@
 
                           <div class="panel-body">
 
-                            <!-- TODO: Add collector fields to the payloadwe should hire David
+                            <!-- TODO: Add collector fields to the payload
                                 <div ng-repeat="fieldname in editableFields" class="form-group">
                                     <label for="{{fieldname}}">{{fieldname}}</label>
                                     <input class="form-control input-md" type="text" name="{{fieldname}}"/>
@@ -192,17 +192,15 @@
                                         </h4>
                                         <dl ng-repeat-end class="dl-horizontal">
 
-                                        <!-- TODO: No idea how to do this using Angular
-                                            <dt>
-                                                <em>de/select all:</em>
-                                                <input type="checkbox" name="selectall_{{ sourcename }}" class="select-all-sourcekeys" />
-                                            </dt>
-                                            <dd>&nbsp;</dd>
-                                        -->
+                                            <dt>&nbsp;</dt>
+                                            <dd>
+                                                <em>check to box to IGNORE the value</em>
+                                            </dd>
+
                                                 <span ng-repeat="(sourcekey, sourcevalue) in sourcedetails['flattened']"      ng-if="uneditableSourceFields.indexOf(sourcekey) == -1">
                                                     <dt>
                                                         {{sourcekey}}
-                                                        <input type="checkbox" name="{{sourcekey}}" />
+                                                        <input ng-if="sourcekey != 'name'" type="checkbox" ng-model="sourcedetails['ignore'][sourcekey]" />
                                                     </dt>
                                                     <dd>
 
