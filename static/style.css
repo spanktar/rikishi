@@ -1,0 +1,88 @@
+/* Header */
+#header {
+    margin-bottom: 15px;
+    background-color: #118226;
+    color: white;
+    padding: 6px 24px;
+    border-bottom: 12px solid black;
+}
+
+#header h1 {
+    font-size: 60px;
+    font-weight: bold;
+    margin: 0 0 0 0;
+}
+
+#header h2 {
+    margin-top: -5px;
+    margin-bottom: 0;
+    font-size: 21px;
+}
+
+h4.source-header {
+    border-bottom: 1px dotted #aaa;
+}
+
+#api-credentials {
+    margin-top: 15px;
+}
+
+#sumo {
+    margin-right: 1em;
+    border: 0;
+}
+
+
+/* Guts */
+#guts h1 {
+    border-bottom: 1px dotted #aaa;
+    font-size: 36px;
+}
+
+
+/* Misc */
+.section-action {
+    margin-top: -9px;
+}
+
+#gather-block {
+    margin-bottom: 15px;
+}
+
+
+/* BUTTONS */
+#bottom-commit-button {
+    margin: 0 1em 1em 0;
+}
+
+#get-button {
+    margin-right: 0.5em;
+}
+
+
+/* API FORM */
+#api-credentials input {
+    height: 24px;
+    font-size: 9px;
+    padding-left: 6px;
+}
+
+#api-credentials .form-group{
+    margin-bottom: 3px;
+}
+
+#selectedCollectorsAccordion dt {
+    width: 100px;
+}
+
+#selectedCollectorsAccordion dd {
+    margin-left: 120px;
+}
+
+.sources-panel .dl-horizontal dt {
+    width: 50%;
+}
+
+.sources-panel .dl-horizontal dd {
+    margin-left: 52%;
+}

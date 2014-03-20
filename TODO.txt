@@ -1,0 +1,26 @@
+As you can see, there are many rough edges, but this wa my first
+Angular/Flask/Bootstrap APP so cut me some slack.  Here are some things that
+need doing.  Also, there are TODO notes in the source:
+
+Most important:
+- ADD ERROR HANDLING OF ANY KIND
+- Tests?
+- Decide if flattening the sources for the data model makes sense
+- What happens if you select things that then vanish?
+- Add spinners for clicks
+- Handle reGather better
+
+Nice to have:
+- Fix collapsing sections logic
+    - Only collapse collectors
+    - Add twisty arrows for cues
+- Try to keep blacklists variable sane throughout
+- Better manage multiple value fields
+- Add bulk checkbox select
+    - Enable ability to only update certain fields
+- Add collector settings too
+- Make collectors filter work on more than just name
+- Sources panel should respond as selections are made. Possible?
+- Try to make less Sumo calls
+- Add Are you sure modal back into the flow
+- Header layout sucks and doesn't respond well

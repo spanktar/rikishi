@@ -1,0 +1,298 @@
+{% raw %}
+<!doctype html>
+
+<html ng-app="nikishiApp">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Rikishi: A Tiny Sumo Wrestler</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/x-icon" />
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body ng-controller="nikishiCtrl">
+
+    <div id="header" class-"container-fluid">
+        <div class="row">
+
+            <div class="col-md-3">
+
+                <form role="form" id="api-credentials" ng-submit="APICredentialForm()" action="" method="POST">
+
+                    <div style="float:left">
+                        <button type="submit" id="get-button" class="btn btn-success btn-lg" value="GET">
+                            1. <span class="glyphicon glyphicon-cloud-download"></span> GET
+                        </button>
+                    </div>
+
+                    <div style="float:left">
+                        <div class="form-group">
+                            <input type="text" class="form-control input-sm" name="apiid" id="apiid" placeholder="Username/API ID" ng-model="apiFormData.apiid">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control input-sm" name="apikey" id="apikey" placeholder="Password/API Key" ng-model="apiFormData.apikey">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="col-md-3" style="float:right">
+                <a href="/">
+                    <img src="static/images/sumo.png" height="90px" alt="Your Tiny Sumo Wrestler" align="left" id="sumo"/>
+                </a>
+                <h1>力士</h1>
+                <h2 class="lead">(rikishi)</h2>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="guts" class="container">
+
+        <div class="panel-group" id="actions">
+
+        <!-- GATHER BLOCK -->
+        <div class="panel panel-default" id="gather-block">
+
+            <div class="panel-heading">
+                <h1 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#actions" href="#collapseCollectors">
+                        2. Collectors</a>
+                    <!-- TODO data-toggle="collapse" data-target="#collapseEditing,#collapseCollectors" -->
+                    <button id="gather-button" type="submit" class="btn btn-primary btn-large section-action" value="Gather" ng-click="getSources()"/ >
+                        <span class="glyphicon glyphicon-leaf"></span> Gather
+                    </button>
+                </h1>
+                <small>Total number of collectors: {{collectors.length}}</small>
+            </div>
+
+            <div id="collapseCollectors" class="panel-collapse collapse in">
+            <div class="panel-body">
+
+                <!-- FILTER BLOCK -->
+                <div class="col-md-4" id="filterblock">
+                    <div class="panel panel-default">
+
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><span class="glyphicon glyphicon-search"></span>&nbsp;Filter Results</h3>
+                        </div>
+
+                        <div class="panel-body">
+                            <p>Filter Collectors by:
+
+                            <select name="filters">
+                                <option value="name">Name</option>
+                                <!--
+                                <option value="emphemeral">Ephemeral</option>
+                                <option value="timeZone">Time Zone</option>
+                                <option value="osArch">OS Architecture</option>
+                                <option value="osName">OS Name</option>
+                                <option value="osVersion">OS Versions</option>
+                                -->
+                            </select>
+
+                            <input type="text" name="filter" ng-model="collectorFilter.name" />
+
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="panel-group" id="accordion">
+
+                      <div class="panel panel-default">
+                        <div class="panel-body">
+                            <input type="checkbox" ng-click="toggleSelected(filteredCollectors)" autocomplete="off" /> Select all shown
+                        </div>
+                      </div>
+
+                      <div ng-repeat="collector in (filteredCollectors = (collectors | filter:collectorFilter))" class="panel panel-default">
+
+                        <div class="panel-heading">
+                          <h4 class="panel-title">
+                            <input type="checkbox" name="collector-id" value="{{collector.id}}" ng-model="collector.selected">&nbsp;
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{$index}}">
+                                {{collector.name}}
+                            </a> <small>({{collector.id}})</small>
+                          </h4>
+                        </div>
+
+                        <div id="collapse{{$index}}" class="panel-collapse collapse">
+                          <div class="panel-body">
+                            <dl class="dl-horizontal">
+                                <span ng-repeat="(k,v) in collector">
+                                    <dt>{{ k }}</dt>
+                                    <dd>{{ v }}</dd>
+                                </span>
+                            </dl>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+                </div>
+
+            </div>
+            </div>
+        </div>
+
+        <!-- EDIT BLOCK -->
+        <form role="form" id="commit-form" ng-submit="commitChanges()" action="" method="POST">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+
+                <h1 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#actions" href="#collapseEditing">
+                        3. Edit
+                    </a>
+                </h1>
+
+                <small>Selected collectors: {{selectedCollectors.length}}</small>
+
+            </div>
+
+            <div id="collapseEditing" class="panel-collapse collapse in">
+            <div class="panel-body">
+
+                <div class="col-md-9">
+                    <div class="panel-group" id="accordion">
+                      <div class="panel panel-default">
+
+                          <div class="panel-body">
+
+                            <!-- TODO: Add collector fields to the payloadwe should hire David
+                                <div ng-repeat="fieldname in editableFields" class="form-group">
+                                    <label for="{{fieldname}}">{{fieldname}}</label>
+                                    <input class="form-control input-md" type="text" name="{{fieldname}}"/>
+                                </div>
+                            -->
+
+                                <div class="panel panel-default sources-panel">
+                                    <div class="panel-heading">
+                                        <h2 class="panel-title">Sources</h2>
+                                    </div>
+                                    <div class="panel-body">
+
+                                        <h4 ng-repeat-start="(sourcename,sourcedetails) in sourceinfo.source_names" class="source-header">
+                                            {{ sourcename }}
+                                        </h4>
+                                        <dl ng-repeat-end class="dl-horizontal">
+
+                                        <!-- TODO: No idea how to do this using Angular
+                                            <dt>
+                                                <em>de/select all:</em>
+                                                <input type="checkbox" name="selectall_{{ sourcename }}" class="select-all-sourcekeys" />
+                                            </dt>
+                                            <dd>&nbsp;</dd>
+                                        -->
+                                                <span ng-repeat="(sourcekey, sourcevalue) in sourcedetails['flattened']"      ng-if="uneditableSourceFields.indexOf(sourcekey) == -1">
+                                                    <dt>
+                                                        {{sourcekey}}
+                                                        <input type="checkbox" name="{{sourcekey}}" />
+                                                    </dt>
+                                                    <dd>
+
+                                                        <input ng-if="String(sourcevalue).indexOf(',') === -1" type="text" class="input-sm form-control btn-warning" ng-model="sourcedetails['flattened'][sourcekey]" />
+
+                                                        <input ng-if="String(sourcevalue).indexOf(',') !== -1" type="text" class="input-sm form-control" ng-model="sourcedetails['flattened'][sourcekey]" />
+
+                                                    </dd>
+                                            </span>
+
+                                        </dl>
+
+                                    </div>
+                                    <div class="form-group"><!-- TODO: data-toggle="modal" data-target="#commit" -->
+                                        <button id="bottom-commit-button" type="submit" class="btn btn-danger btn-large section-action pull-right" value="Commit" class="section-action">
+                                            <span class="glyphicon glyphicon-fire"></span> Commit
+                                        </button>
+                                    </div>
+                                </div>
+
+                          </div>
+
+                      </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="panel-group" id="selectedCollectorsAccordion">
+
+                    <h4>Nodes in Play:</h4>
+
+                      <div ng-repeat="collector in (selectedCollectors = (collectors | filter: {selected: true}))" class="panel panel-default">
+
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#selectedCollectorsAccordion" href="#collapseSelected{{$index}}">
+                                    {{collector.name}}
+                                </a>
+                            </h4>
+                        </div>
+
+                        <div id="collapseSelected{{$index}}" class="panel-collapse collapse">
+                          <div class="panel-body">
+                            <small>
+                                <dl class="dl-horizontal">
+                                    <dt ng-repeat-start="(k,v) in collector">{{ k }}</dt>
+                                    <dd ng-repeat-end>{{ v }}</dd>
+                                </dl>
+                            </small>
+                          </div>
+                        </div>
+
+                      </div>
+                    <!-- end loop -->
+                    </div>
+                </div>
+
+            </div>
+            </div>
+
+        </div>
+        </form>
+
+        </div>
+    </div>
+
+    <!-- Commit Modal -->
+    <div class="modal fade" id="commit" tabindex="-1" role="dialog" aria-labelledby="Tachi-ai" aria-hidden="true" data-keyboard="true">
+      <div class="modal-dialog">
+        <div class="modal-content panel-danger">
+          <div class="modal-header panel-heading">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Tachi-ai!</h4>
+          </div>
+          <div class="modal-body">
+            <p>You are about to edit a lot of collectors. Are you sure?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-warning" data-dismiss="modal">OMG, NO</button>
+            <button type="button" class="btn btn-success">YES!</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="/static/javascript.js"></script>
+
+</body>
+</html>
+{% endraw %}
