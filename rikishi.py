@@ -192,11 +192,11 @@ def putCollectors():
                     throwaway, etag = sumo.source(collectorid, sourceid)
                     result = sumo.update_source(collectorid, {'source': sourcepayload}, etag)
 
-                    if str(result.status_code).startswith("2"):
-                        response['success'].append(result)
-                    else:
-                        response['errors'].append(result)
-                    break
+#                    if str(result.status_code).startswith("2"):
+#                        response['success'].append(result)
+#                    else:
+#                        response['errors'].append(result)
+#                    break
 
     # TODO: actually return useful information
     return jsonify(results = response)
