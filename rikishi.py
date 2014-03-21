@@ -27,7 +27,6 @@ def getCollectors():
 
     sumo = SumoLogic(apiid, apikey)
     data = sumo.collectors()
-    #fakedata = [{u'collectorType': u'Installable', u'osVersion': u'2.6.32-41-generic', u'name': u'amsintgvhub01', u'links': [{u'href': u'/v1/collectors/8596784/sources', u'rel': u'sources'}], u'ephemeral': False, u'osName': u'Linux', u'alive': True, u'osArch': u'amd64', u'timeZone': u'America/Los_Angeles', u'collectorVersion': u'19.74-1', u'id': 8596784}]
 
     return jsonify(results = data)
 
@@ -123,7 +122,6 @@ def getSources():
                 else:
                     flattener[srckey].add(srcval)
 
-
         # What got flattened?
         # Since we have to tie the Angular data model to a flattened version (sigh)
         # we build this flattened dict instead of using the original sources. It
@@ -140,7 +138,7 @@ def getSources():
         # Not all values are returned with every API call.
         # Blacklist is one of them, but it needs to be here
         # in order to be rendered in the template.  This
-        # should be handled better eventually.
+        # should be handled better eventually. TODO
         if 'blacklist' not in flattener:
             sourceinfo['source_names'][sourcename]['flattened']['blacklist'] = []
 
@@ -156,12 +154,6 @@ def putCollectors():
     response = { 'errors' : [],
                  'success': []}
 
-    # REFACTOR PLAN:
-    # [foo() for collectorid in data['collector_map'].keys()
-    #        for sourceid in data['collector_map'][collectorid]
-    #        for sourcename in data['sources'].keys()
-    #            if sourceid in data['sources'][sourcename]['id']]
-
     # Go through each collector in the collector_map:
     for collectorid in data['collector_map'].keys():
 
@@ -171,38 +163,41 @@ def putCollectors():
             # Find the souce that matches the name (they're by name, for UI)
             for sourcename in data['source_names'].keys():
 
-                # If there's a match, send the source to Sumo for update
-                if sourceid in data['source_names'][sourcename]['memberids']:
+                # Do we skip this source altogether? (Over)Complicated by transient nature of 'selected'
+                if not 'selected' in data['source_names'][sourcename] or ('selected' in data['source_names'][sourcename] and not data['source_names'][sourcename]['selected']):
 
-                    # We'll be mutating this, so keep the original re-usable
-                    sourcepayload = deepcopy(data['source_names'][sourcename]['flattened'])
+                    # If there's a match, send the source to Sumo for update
+                    if sourceid in data['source_names'][sourcename]['memberids']:
 
-                    # Blacklists must be a list of path expressions, or missing:
-                    if len(sourcepayload['blacklist']):
-                        blklst = []
-                        [blklst.append(blacklist.strip()) for blacklist in sourcepayload['blacklist'].split(",")]
-                        sourcepayload['blacklist'] = blklst
-                    else:
-                        sourcepayload.pop('blacklist', None)
+                        # We'll be mutating this, so keep the original re-usable
+                        sourcepayload = deepcopy(data['source_names'][sourcename]['flattened'])
 
-                    # Remove keys marked to be ignored
-                    for ignorekey in data['source_names'][sourcename]['ignore']:
-                        if ignorekey in sourcepayload:
-                            del sourcepayload[ignorekey]
+                        # Blacklists must be a list of path expressions, or missing:
+                        if len(sourcepayload['blacklist']):
+                            blklst = []
+                            [blklst.append(blacklist.strip()) for blacklist in sourcepayload['blacklist'].split(",")]
+                            sourcepayload['blacklist'] = blklst
+                        else:
+                            sourcepayload.pop('blacklist', None)
 
-                    # The ID is deliberately absent from the flattened data, add
-                    sourcepayload['id'] = sourceid
+                        # Remove keys marked to be ignored
+                        for ignorekey in data['source_names'][sourcename]['ignore']:
+                            if ignorekey in sourcepayload:
+                                del sourcepayload[ignorekey]
 
-                    # You have to get the etag from a collector call
-                    # TODO: refactor the initial fetch to include this somehow.
-                    throwaway, etag = sumo.source(collectorid, sourceid)
-                    result = sumo.update_source(collectorid, {'source': sourcepayload}, etag)
+                        # The ID is deliberately absent from the flattened data, add
+                        sourcepayload['id'] = sourceid
 
-#                    if str(result.status_code).startswith("2"):
-#                        response['success'].append(result)
-#                    else:
-#                        response['errors'].append(result)
-                    break
+                        # You have to get the etag from a collector call
+                        # TODO: refactor the initial fetch to include this somehow.
+                        throwaway, etag = sumo.source(collectorid, sourceid)
+                        result = sumo.update_source(collectorid, {'source': sourcepayload}, etag)
+
+    #                    if str(result.status_code).startswith("2"):
+    #                        response['success'].append(result)
+    #                    else:
+    #                        response['errors'].append(result)
+                        break
 
     # TODO: actually return useful information
     return jsonify(results = response)

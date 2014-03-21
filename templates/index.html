@@ -89,22 +89,23 @@
                         </div>
 
                         <div class="panel-body">
-                            <p>Filter Collectors by:
+                            <div class="form-group">
+                                Filter Collectors by:
 
-                            <select name="filters">
-                                <option value="name">Name</option>
-                                <!--
-                                <option value="emphemeral">Ephemeral</option>
-                                <option value="timeZone">Time Zone</option>
-                                <option value="osArch">OS Architecture</option>
-                                <option value="osName">OS Name</option>
-                                <option value="osVersion">OS Versions</option>
-                                -->
-                            </select>
-
-                            <input type="text" name="filter" ng-model="collectorFilter.name" />
-
-                            </p>
+                                <select name="filters">
+                                    <option value="name">Name</option>
+                                    <!--
+                                    <option value="emphemeral">Ephemeral</option>
+                                    <option value="timeZone">Time Zone</option>
+                                    <option value="osArch">OS Architecture</option>
+                                    <option value="osName">OS Name</option>
+                                    <option value="osVersion">OS Versions</option>
+                                    -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input class="form-control input-sm" type="text" name="filter" ng-model="collectorFilter.name" />
+                            </div>
                         </div>
 
                     </div>
@@ -115,7 +116,7 @@
 
                       <div class="panel panel-default">
                         <div class="panel-body">
-                            <input type="checkbox" ng-click="toggleSelected(filteredCollectors)" autocomplete="off" /> Select all shown
+                            <input type="checkbox" ng-click="toggleSelected(filteredCollectors)" autocomplete="off" /> Select all Collectors shown
                         </div>
                       </div>
 
@@ -183,18 +184,18 @@
 
                                 <div class="panel panel-default sources-panel">
                                     <div class="panel-heading">
-                                        <h2 class="panel-title">Sources</h2>
+                                        <h2 class="panel-title">Sources <small>(checkboxes mean ignore)</small></h2>
                                     </div>
                                     <div class="panel-body">
 
                                         <h4 ng-repeat-start="(sourcename,sourcedetails) in sourceinfo.source_names" class="source-header">
-                                            {{ sourcename }}
+                                            <input type="checkbox" ng-model="sourceinfo.source_names[sourcename].selected" />&nbsp;{{ sourcename }}
                                         </h4>
                                         <dl ng-repeat-end class="dl-horizontal">
 
                                             <dt>&nbsp;</dt>
                                             <dd>
-                                                <em>check to box to IGNORE the value</em>
+                                                <em>checkbox ignores field</em>
                                             </dd>
 
                                                 <span ng-repeat="(sourcekey, sourcevalue) in sourcedetails['flattened']"      ng-if="uneditableSourceFields.indexOf(sourcekey) == -1">
