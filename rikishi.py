@@ -173,12 +173,10 @@ def putCollectors():
                         sourcepayload = deepcopy(data['source_names'][sourcename]['flattened'])
 
                         # Blacklists must be a list of path expressions, or missing:
-                        if len(sourcepayload['blacklist']):
+                        if 'blacklist' in sourcepayload and not isinstance(sourcepayload['blacklist'], list):
                             blklst = []
                             [blklst.append(blacklist.strip()) for blacklist in sourcepayload['blacklist'].split(",")]
                             sourcepayload['blacklist'] = blklst
-                        else:
-                            sourcepayload.pop('blacklist', None)
 
                         # Remove keys marked to be ignored
                         for ignorekey in data['source_names'][sourcename]['ignore']:
@@ -188,10 +186,26 @@ def putCollectors():
                         # The ID is deliberately absent from the flattened data, add
                         sourcepayload['id'] = sourceid
 
+                        # Grrrrr:
+                        # "All modifiable fields must be provided, and all immutable
+                        # fields must match those existing in the system." --Sumo
+                        sourcepayload['sourceType'] = data['all_sources'][str(sourceid)]['sourceType']
+
+                        # Even more Grrrrr: FIX
+                        # Boolean values come through as strings.  Does this get any more painful?
+                        for grrr in ['automaticDateParsing', 'forceTimeZone', 'multilineProcessingEnabled', 'useAutolineMatching']:
+                            if not isinstance(sourcepayload[grrr], bool):
+                                if sourcepayload[grrr].lower() == 'false':
+                                    sourcepayload[grrr] = False
+                                else:
+                                    sourcepayload[grrr] = True
+
                         # You have to get the etag from a collector call
                         # TODO: refactor the initial fetch to include this somehow.
                         throwaway, etag = sumo.source(collectorid, sourceid)
                         result = sumo.update_source(collectorid, {'source': sourcepayload}, etag)
+
+                        print "%s: %s" % (result.status_code, result.text)
 
     #                    if str(result.status_code).startswith("2"):
     #                        response['success'].append(result)
