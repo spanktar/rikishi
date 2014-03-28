@@ -191,6 +191,12 @@
                                         <h4 ng-repeat-start="(sourcename,sourcedetails) in sourceinfo.source_names" class="source-header">
                                             <input type="checkbox" ng-model="sourceinfo.source_names[sourcename].selected" />&nbsp;{{ sourcename }}
                                         </h4>
+
+                                        <span class="pull-right text-danger">
+                                            Delete this source?
+                                            <input type="checkbox" ng-model="sourceinfo.source_names[sourcename].delete" />
+                                        </span>
+
                                         <dl ng-repeat-end class="dl-horizontal">
 
                                             <dt>&nbsp;</dt>

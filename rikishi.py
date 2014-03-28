@@ -169,49 +169,60 @@ def putCollectors():
                     # If there's a match, send the source to Sumo for update
                     if sourceid in data['source_names'][sourcename]['memberids']:
 
-                        # We'll be mutating this, so keep the original re-usable
-                        sourcepayload = deepcopy(data['source_names'][sourcename]['flattened'])
+                        # Are we just here to delete?
+                        if 'delete' in data['source_names'][sourcename] and data['source_names'][sourcename]['delete'] == True:
+                            print "- Deleting collector %s's source %s named %s." % (collectorid, str(sourceid), sourcename)
+                            result = sumo.delete_source(collectorid, {'source': {'id': sourceid }})
+                            print "- Delete Source: %s" % result.status_code
+                        else:
+                            # We'll be mutating this, so keep the original re-usable
+                            sourcepayload = deepcopy(data['source_names'][sourcename]['flattened'])
 
-                        # Blacklists must be a list of path expressions, or missing:
-                        if 'blacklist' in sourcepayload and not isinstance(sourcepayload['blacklist'], list):
-                            blklst = []
-                            [blklst.append(blacklist.strip()) for blacklist in sourcepayload['blacklist'].split(",")]
-                            sourcepayload['blacklist'] = blklst
+                            # Blacklists must be a list of path expressions, or missing:
+                            if 'blacklist' in sourcepayload and not isinstance(sourcepayload['blacklist'], list):
+                                blklst = []
+                                [blklst.append(blacklist.strip()) for blacklist in sourcepayload['blacklist'].split(",")]
+                                sourcepayload['blacklist'] = blklst
 
-                        # Remove keys marked to be ignored
-                        for ignorekey in data['source_names'][sourcename]['ignore']:
-                            if ignorekey in sourcepayload:
-                                del sourcepayload[ignorekey]
+                            # Remove keys marked to be ignored
+                            for ignorekey in data['source_names'][sourcename]['ignore']:
+                                if ignorekey in sourcepayload:
+                                    del sourcepayload[ignorekey]
 
-                        # The ID is deliberately absent from the flattened data, add
-                        sourcepayload['id'] = sourceid
+                            # The ID is deliberately absent from the flattened data, add
+                            sourcepayload['id'] = sourceid
 
-                        # Grrrrr:
-                        # "All modifiable fields must be provided, and all immutable
-                        # fields must match those existing in the system." --Sumo
-                        sourcepayload['sourceType'] = data['all_sources'][str(sourceid)]['sourceType']
+                            # Grrrrr:
+                            # "All modifiable fields must be provided, and all immutable
+                            # fields must match those existing in the system." --Sumo
+                            sourcepayload['sourceType'] = data['all_sources'][str(sourceid)]['sourceType']
 
-                        # Even more Grrrrr: FIX
-                        # Boolean values come through as strings.  Does this get any more painful?
-                        for grrr in ['automaticDateParsing', 'forceTimeZone', 'multilineProcessingEnabled', 'useAutolineMatching']:
-                            if not isinstance(sourcepayload[grrr], bool):
-                                if sourcepayload[grrr].lower() == 'false':
-                                    sourcepayload[grrr] = False
-                                else:
-                                    sourcepayload[grrr] = True
+                            # Even more Grrrrr: FIX
+                            # Boolean values come through as strings.  Does this get any more painful?
+                            for grrr in ['automaticDateParsing', 'forceTimeZone', 'multilineProcessingEnabled', 'useAutolineMatching']:
+                                if not isinstance(sourcepayload[grrr], bool):
+                                    if sourcepayload[grrr].lower() == 'false':
+                                        sourcepayload[grrr] = False
+                                    else:
+                                        sourcepayload[grrr] = True
 
-                        # You have to get the etag from a collector call
-                        # TODO: refactor the initial fetch to include this somehow.
-                        throwaway, etag = sumo.source(collectorid, sourceid)
-                        result = sumo.update_source(collectorid, {'source': sourcepayload}, etag)
+                            print "+ Updating Collector %s's source %s named %s" % (collectorid, sourceid, sourcename)
 
-                        print "%s: %s" % (result.status_code, result.text)
+                            # You have to get the etag from a collector call
+                            # TODO: refactor the initial fetch to include this somehow.
+                            throwaway, etag = sumo.source(collectorid, sourceid)
+                            result = sumo.update_source(collectorid, {'source': sourcepayload}, etag)
 
-    #                    if str(result.status_code).startswith("2"):
-    #                        response['success'].append(result)
-    #                    else:
-    #                        response['errors'].append(result)
+                            print "+ Source Update: %s" % result.status_code #, result.text)
+
+                            # if str(result.status_code).startswith("2"):
+                            #     response['success'].append(result)
+                            # else:
+                            #     response['errors'].append(result)
+
                         break
+                else:
+                    print ". Skipping source %s" % sourcename
 
     # TODO: actually return useful information
     return jsonify(results = response)
