@@ -67,6 +67,8 @@
 
             <div class="panel-heading">
                 <h1 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#actions" href="#collapseCollectors"><span class="glyphicon glyphicon-chevron-down"></span></a>
+
                     <a data-toggle="collapse" data-parent="#actions" href="#collapseCollectors">
                         2. Collectors</a>
                     <!-- TODO data-toggle="collapse" data-target="#collapseEditing,#collapseCollectors" -->
@@ -157,7 +159,7 @@
             <div class="panel-heading">
 
                 <h1 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#actions" href="#collapseEditing">
+                    <a data-toggle="collapse" data-parent="#actions" href="#collapseCollectors">
                         3. Edit
                     </a>
                 </h1>
@@ -173,7 +175,7 @@
                     <div class="panel-group" id="accordion">
                       <div class="panel panel-default">
 
-                          <div class="panel-body">
+                        <div class="panel-body">
 
                             <!-- TODO: Add collector fields to the payload
                                 <div ng-repeat="fieldname in editableFields" class="form-group">
@@ -182,53 +184,56 @@
                                 </div>
                             -->
 
-                                <div class="panel panel-default sources-panel">
-                                    <div class="panel-heading">
-                                        <h2 class="panel-title">Sources <small>(checkboxes mean ignore)</small></h2>
-                                    </div>
-                                    <div class="panel-body">
+                            <div class="panel panel-default sources-panel">
+                                <div class="panel-heading">
+                                    <h2 class="panel-title">Sources <small>(checkboxes mean ignore)</small></h2>
+                                </div>
+                                <div class="panel-body">
 
-                                        <h4 ng-repeat-start="(sourcename,sourcedetails) in sourceinfo.source_names" class="source-header">
-                                            <input type="checkbox" ng-model="sourceinfo.source_names[sourcename].selected" />&nbsp;{{ sourcename }}
-                                        </h4>
+                                    <h4 ng-repeat-start="(sourcename,sourcedetails) in sourceinfo.source_names" class="source-header">
+                                        <input type="checkbox" ng-model="sourceinfo.source_names[sourcename].selected" />&nbsp;{{ sourcename }}<br/>
+                                        <small>
+                                            <span ng-repeat="collectorname in sourcedetails.collectors">{{collectorname}}{{$last ? '' : ', '}}</span>
+                                        </small>
+                                    </h4>
 
-                                        <span class="pull-right text-danger">
-                                            Delete this source?
-                                            <input type="checkbox" ng-model="sourceinfo.source_names[sourcename].delete" />
+                                    <span class="pull-right text-danger">
+                                        Delete this source?
+                                        <input type="checkbox" ng-model="sourceinfo.source_names[sourcename].delete" />
+                                    </span>
+
+                                    <dl ng-repeat-end class="dl-horizontal">
+
+                                        <dt>&nbsp;</dt>
+                                        <dd>
+                                            <em>checkbox ignores field</em>
+                                        </dd>
+
+                                            <span ng-repeat="(sourcekey, sourcevalue) in sourcedetails['flattened']"      ng-if="uneditableSourceFields.indexOf(sourcekey) == -1">
+                                                <dt>
+                                                    {{sourcekey}}
+                                                    <input ng-if="sourcekey != 'name'" type="checkbox" ng-model="sourcedetails['ignore'][sourcekey]" />
+                                                </dt>
+                                                <dd>
+
+                                                    <input ng-if="String(sourcevalue).indexOf(',') === -1" type="text" class="input-sm form-control btn-warning" ng-model="sourcedetails['flattened'][sourcekey]" />
+
+                                                    <input ng-if="String(sourcevalue).indexOf(',') !== -1" type="text" class="input-sm form-control" ng-model="sourcedetails['flattened'][sourcekey]" />
+
+                                                </dd>
                                         </span>
 
-                                        <dl ng-repeat-end class="dl-horizontal">
+                                    </dl>
 
-                                            <dt>&nbsp;</dt>
-                                            <dd>
-                                                <em>checkbox ignores field</em>
-                                            </dd>
-
-                                                <span ng-repeat="(sourcekey, sourcevalue) in sourcedetails['flattened']"      ng-if="uneditableSourceFields.indexOf(sourcekey) == -1">
-                                                    <dt>
-                                                        {{sourcekey}}
-                                                        <input ng-if="sourcekey != 'name'" type="checkbox" ng-model="sourcedetails['ignore'][sourcekey]" />
-                                                    </dt>
-                                                    <dd>
-
-                                                        <input ng-if="String(sourcevalue).indexOf(',') === -1" type="text" class="input-sm form-control btn-warning" ng-model="sourcedetails['flattened'][sourcekey]" />
-
-                                                        <input ng-if="String(sourcevalue).indexOf(',') !== -1" type="text" class="input-sm form-control" ng-model="sourcedetails['flattened'][sourcekey]" />
-
-                                                    </dd>
-                                            </span>
-
-                                        </dl>
-
-                                    </div>
-                                    <div class="form-group"><!-- TODO: data-toggle="modal" data-target="#commit" -->
-                                        <button id="bottom-commit-button" type="submit" class="btn btn-danger btn-large section-action pull-right" value="Commit" class="section-action">
-                                            <span class="glyphicon glyphicon-fire"></span> Commit
-                                        </button>
-                                    </div>
                                 </div>
+                                <div class="form-group"><!-- TODO: data-toggle="modal" data-target="#commit" -->
+                                    <button id="bottom-commit-button" type="submit" class="btn btn-danger btn-large section-action pull-right" value="Commit" class="section-action">
+                                        <span class="glyphicon glyphicon-fire"></span> Commit
+                                    </button>
+                                </div>
+                            </div>
 
-                          </div>
+                        </div>
 
                       </div>
                     </div>
@@ -244,7 +249,7 @@
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a data-toggle="collapse" data-parent="#selectedCollectorsAccordion" href="#collapseSelected{{$index}}">
-                                    {{collector.name}}
+                                    {{collector.name}} <small>{{collector.id}}</small>
                                 </a>
                             </h4>
                         </div>
@@ -293,9 +298,23 @@
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
+    <div id="gatherModal" class="modal fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h4>Fetching Collectors</h4>
+                <div style="height:200px">
+                    <span class="spinner_center"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="//fgnass.github.io/spin.js/spin.min.js"></script>
     <script src="/static/javascript.js"></script>
 
 </body>

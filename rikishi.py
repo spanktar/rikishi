@@ -48,7 +48,9 @@ def getSources():
         'source_names': {
             'Friendly Source Name #1': {
                 'memberids': [8583428, 8583111],
-                'flattened' : {FLATTENED OBJECT VALUES}
+                'flattened' : {FLATTENED OBJECT VALUES},
+                'ignore': {},
+                'collectors': ['prodweb01', 'stagedb02']
             },
             'Friendly Source Name #2': {
                 'memberids': [8583846, 8583298],
@@ -96,9 +98,11 @@ def getSources():
             if source['name'] not in sourceinfo['source_names']:
                 sourceinfo['source_names'][source['name']] = {'memberids': [],
                                                               'flattened': {},
-                                                              'ignore': {}}
+                                                              'ignore': {},
+                                                              'collectors': []}
 
             sourceinfo['source_names'][source['name']]['memberids'].append(source['id'])
+            sourceinfo['source_names'][source['name']]['collectors'].append(collector['name'])
 
             # Update the collector_map with this source's key
             sourceinfo['collector_map'][collector['id']].append(source['id'])
@@ -226,6 +230,11 @@ def putCollectors():
 
     # TODO: actually return useful information
     return jsonify(results = response)
+
+
+@app.route("/addCollectors", methods=['POST'])
+def addCollectors():
+    pass
 
 if __name__ == "__main__":
     app.run()

@@ -49,6 +49,18 @@ h4.source-header {
     margin-bottom: 15px;
 }
 
+/* Spinners */
+.spinner_center {
+    position: absolute;
+    display: block;
+    top: 50%;
+    left: 50%;
+}
+
+#gatherModal .modal-dialog{
+    width: 300px;
+}
+
 
 /* BUTTONS */
 #bottom-commit-button {

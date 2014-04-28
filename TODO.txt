@@ -13,11 +13,9 @@ Most important:
 Nice to have:
 - Fix collapsing sections logic
     - Only collapse collectors
-    - Add twisty arrows for cues
+    - Add twisty arrows for cues - HALF DONE
 - Try to keep blacklists variable sane throughout
 - Better manage multiple value fields
-- Add bulk checkbox select
-    - Enable ability to only update certain fields
 - Add collector settings too
 - Make collectors filter work on more than just name
 - Sources panel should respond as selections are made. Possible?
