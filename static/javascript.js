@@ -14,6 +14,7 @@ nikishiApp.controller('nikishiCtrl', function ($scope, $http) {
     $scope.counter = Object.keys($scope.selectedCollectors).length;
     $scope.editableFields = ['timeZone', 'ephemeral'];
     $scope.uneditableSourceFields = ['alive', 'id', 'selected'];
+    $scope.addFields = ['automaticDateParsing', 'blacklist', 'category', 'description', 'encoding', 'forceTimeZone', 'multilineProcessingEnabled', 'name', 'pathExpression', 'sourceType', 'useAutolineMatching'];
 
     $scope.APICredentialForm = function() {
         $('#gatherModal').modal('show');
@@ -35,7 +36,15 @@ nikishiApp.controller('nikishiCtrl', function ($scope, $http) {
 
     $scope.commitChanges = function() {
         var payload = angular.extend({}, $scope.apiFormData, $scope.sourceinfo);
-        $http.post('putCollectors', payload).success(function(data) {
+        var method = 'putCollectors';
+
+        if ($scope.addcollector.selected === true) {
+            var collectors = { 'collectors': $scope.selectedCollectors};
+            payload = angular.extend({}, $scope.apiFormData, $scope.addcollector, collectors);
+            method = 'addCollector';
+        }
+
+        $http.post(method, payload).success(function(data) {
             $scope.commitResponse = data.results;
         });
     };

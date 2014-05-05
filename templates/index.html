@@ -30,18 +30,18 @@
                 <form role="form" id="api-credentials" ng-submit="APICredentialForm()" action="" method="POST">
 
                     <div style="float:left">
-                        <button type="submit" id="get-button" class="btn btn-success btn-lg" value="GET">
-                            1. <span class="glyphicon glyphicon-cloud-download"></span> GET
-                        </button>
-                    </div>
-
-                    <div style="float:left">
                         <div class="form-group">
                             <input type="text" class="form-control input-sm" name="apiid" id="apiid" placeholder="Username/API ID" ng-model="apiFormData.apiid">
                         </div>
                         <div class="form-group">
                             <input type="text" class="form-control input-sm" name="apikey" id="apikey" placeholder="Password/API Key" ng-model="apiFormData.apikey">
                         </div>
+                    </div>
+
+                    <div style="float:left">
+                        <button type="submit" id="get-button" class="btn btn-success btn-lg" value="GET">
+                            1. <span class="glyphicon glyphicon-cloud-download"></span> GET
+                        </button>
                     </div>
 
                 </form>
@@ -67,7 +67,7 @@
 
             <div class="panel-heading">
                 <h1 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#actions" href="#collapseCollectors"><span class="glyphicon glyphicon-chevron-down"></span></a>
+                    <a data-toggle="collapse" data-parent="#actions" href="#collapseCollectors"><span class="glyphicon glyphicon-chevron-down text-info"></span></a>
 
                     <a data-toggle="collapse" data-parent="#actions" href="#collapseCollectors">
                         2. Collectors</a>
@@ -186,9 +186,51 @@
 
                             <div class="panel panel-default sources-panel">
                                 <div class="panel-heading">
-                                    <h2 class="panel-title">Sources <small>(checkboxes mean ignore)</small></h2>
+                                    <h2 class="panel-title">
+                                        <a data-toggle="collapse" href="#collapseAdding">
+                                            <span class="glyphicon glyphicon-plus-sign text-success"></span>
+                                            Add Source</a>
+                                            <small>(Sorry, only one at a time for now)</small>
+                                    </h2>
                                 </div>
-                                <div class="panel-body">
+                                <div class="panel-body panel-collapse collapse" id="collapseAdding">
+
+                                    <p class="text-warning"><span class="glyphicon glyphicon-exclamation-sign text-warning"></span> You are adding the following source to <strong>all of the selected collectors.</strong></p>
+
+                                    <p><input type="checkbox" ng-model="addcollector.selected" /> Check here to add the following collector:<br/>
+                                    (Checking this box will be sure to only add this collector, not edit the collectors below)</p>
+
+                                    <dl class="dl-horizontal">
+                                        <span ng-repeat="addkey in addFields">
+                                            <dt>
+                                                {{addkey}}
+                                            </dt>
+                                            <dd>
+                                                <input type="text" class="input-sm form-control" name="{{addkey}}" ng-model="addcollector[addkey]" />
+                                            </dd>
+                                        </span>
+
+                                    </dl>
+
+                                    <div class="form-group">
+                                        <button id="bottom-commit-button" type="submit" class="btn btn-danger btn-large section-action pull-right" value="Commit" class="section-action">
+                                            <span class="glyphicon glyphicon-fire"></span> Commit
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="panel panel-default sources-panel">
+                                <div class="panel-heading">
+                                    <h2 class="panel-title">
+                                        <a data-toggle="collapse" href="#collapseSources">
+                                            <span class="glyphicon glyphicon-pencil text-primary"></span>
+                                            Edit Sources</a>
+                                            <small>(checkboxes mean ignore)</small>
+                                    </h2>
+                                </div>
+                                <div class="panel-body panel-collapse collapse in" id="collapseSources">
 
                                     <h4 ng-repeat-start="(sourcename,sourcedetails) in sourceinfo.source_names" class="source-header">
                                         <input type="checkbox" ng-model="sourceinfo.source_names[sourcename].selected" />&nbsp;{{ sourcename }}<br/>
@@ -198,7 +240,7 @@
                                     </h4>
 
                                     <span class="pull-right text-danger">
-                                        Delete this source?
+                                        Delete source?
                                         <input type="checkbox" ng-model="sourceinfo.source_names[sourcename].delete" />
                                     </span>
 
@@ -209,7 +251,7 @@
                                             <em>checkbox ignores field</em>
                                         </dd>
 
-                                            <span ng-repeat="(sourcekey, sourcevalue) in sourcedetails['flattened']"      ng-if="uneditableSourceFields.indexOf(sourcekey) == -1">
+                                            <span ng-repeat="(sourcekey, sourcevalue) in sourcedetails['flattened']" ng-if="uneditableSourceFields.indexOf(sourcekey) == -1">
                                                 <dt>
                                                     {{sourcekey}}
                                                     <input ng-if="sourcekey != 'name'" type="checkbox" ng-model="sourcedetails['ignore'][sourcekey]" />
@@ -224,13 +266,13 @@
                                         </span>
 
                                     </dl>
-
-                                </div>
                                 <div class="form-group"><!-- TODO: data-toggle="modal" data-target="#commit" -->
                                     <button id="bottom-commit-button" type="submit" class="btn btn-danger btn-large section-action pull-right" value="Commit" class="section-action">
                                         <span class="glyphicon glyphicon-fire"></span> Commit
                                     </button>
                                 </div>
+                                </div>
+
                             </div>
 
                         </div>

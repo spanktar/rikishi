@@ -232,9 +232,27 @@ def putCollectors():
     return jsonify(results = response)
 
 
-@app.route("/addCollectors", methods=['POST'])
-def addCollectors():
-    pass
+@app.route("/addCollector", methods=['POST'])
+def addCollector():
+
+    data = request.json
+    sumo = SumoLogic(data['apiid'], data['apikey'])
+    response = { 'errors' : [],
+                 'success': []}
+
+    params = {}
+    remove = ('apiid', 'apikey', 'collectors', 'selected')
+    for key in data.keys():
+        if key not in remove:
+            params[key] = data[key]
+
+    for collector in data['collectors']:
+        endpoint = '/collectors/%s/sources' % collector['id']
+        response = sumo.put(endpoint, params)
+
+    # TODO: actually return useful information
+    return jsonify(results = response)
+
 
 if __name__ == "__main__":
     app.run()
