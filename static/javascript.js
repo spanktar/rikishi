@@ -38,7 +38,7 @@ nikishiApp.controller('nikishiCtrl', function ($scope, $http) {
         var payload = angular.extend({}, $scope.apiFormData, $scope.sourceinfo);
         var method = 'putCollectors';
 
-        if ($scope.addcollector.selected === true) {
+        if (typeof $scope.addcollector !== 'undefined' && $scope.addcollector.selected === true) {
             var collectors = { 'collectors': $scope.selectedCollectors};
             payload = angular.extend({}, $scope.apiFormData, $scope.addcollector, collectors);
             method = 'addCollector';

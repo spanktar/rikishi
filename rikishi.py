@@ -10,6 +10,18 @@ app.debug = True
 
 uneditableSourceFields = ['alive', 'id', 'selected', 'sourceType']
 
+def fixBooleans(payload):
+    # Even more Grrrrr: FIX
+    # Boolean values come through as strings.  Does this get any more painful?
+    for grrr in ['automaticDateParsing', 'forceTimeZone', 'multilineProcessingEnabled', 'useAutolineMatching']:
+        if grrr in payload and not isinstance(payload[grrr], bool):
+            if payload[grrr].lower() == 'false':
+                payload[grrr] = False
+            else:
+                payload[grrr] = True
+
+    return payload
+
 @app.route("/")
 def hello():
     return render_template('index.html')
@@ -201,14 +213,8 @@ def putCollectors():
                             # fields must match those existing in the system." --Sumo
                             sourcepayload['sourceType'] = data['all_sources'][str(sourceid)]['sourceType']
 
-                            # Even more Grrrrr: FIX
-                            # Boolean values come through as strings.  Does this get any more painful?
-                            for grrr in ['automaticDateParsing', 'forceTimeZone', 'multilineProcessingEnabled', 'useAutolineMatching']:
-                                if not isinstance(sourcepayload[grrr], bool):
-                                    if sourcepayload[grrr].lower() == 'false':
-                                        sourcepayload[grrr] = False
-                                    else:
-                                        sourcepayload[grrr] = True
+                            # Convert boolean string to booleans
+                            sourcepayload = fixBooleans(sourcepayload)
 
                             print "+ Updating Collector %s's source %s named %s" % (collectorid, sourceid, sourcename)
 
@@ -246,9 +252,12 @@ def addCollector():
         if key not in remove:
             params[key] = data[key]
 
+    # Convert boolean string to booleans
+    payload = {'source': fixBooleans(params)}
+
     for collector in data['collectors']:
         endpoint = '/collectors/%s/sources' % collector['id']
-        response = sumo.put(endpoint, params)
+        response = sumo.post(endpoint, payload)
 
     # TODO: actually return useful information
     return jsonify(results = response)
