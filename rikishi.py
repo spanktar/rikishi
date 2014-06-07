@@ -4,6 +4,7 @@ from sumologic import SumoLogic
 import bleach
 from collections import defaultdict
 from copy import deepcopy
+from time import sleep
 
 app = Flask(__name__)
 app.debug = True
@@ -91,7 +92,9 @@ def getSources():
 
     for collector in data['collectors']:
         # Get each collector's source from Sumo & store locally:
+
         sources = sumo.sources(collector['id'])
+        sleep(0.15)
 
         # Add a key of the collector's id to the map. This map maps
         # sources to collectors so we don't have to keep asking Sumo.
@@ -222,6 +225,7 @@ def putCollectors():
                             # TODO: refactor the initial fetch to include this somehow.
                             throwaway, etag = sumo.source(collectorid, sourceid)
                             result = sumo.update_source(collectorid, {'source': sourcepayload}, etag)
+                            sleep(0.15)
 
                             print "+ Source Update: %s" % result.status_code #, result.text)
 
@@ -258,6 +262,7 @@ def addCollector():
     for collector in data['collectors']:
         endpoint = '/collectors/%s/sources' % collector['id']
         response = sumo.post(endpoint, payload)
+        sleep(0.15)
 
     # TODO: actually return useful information
     return jsonify(results = response)
